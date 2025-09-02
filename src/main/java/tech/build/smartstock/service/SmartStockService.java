@@ -1,15 +1,46 @@
 package tech.build.smartstock.service;
 
+import org.springframework.stereotype.Service;
+import tech.build.smartstock.domain.CsvStockItem;
+
+import java.io.IOException;
+
+@Service
 public class SmartStockService {
 
-    public void process(String reportPath) {
+    private final ReportService reportService;
+
+    public SmartStockService(ReportService reportService) {
+        this.reportService = reportService;
+    }
+
+    public void start(String reportPath) {
 
         // 1. ler o arquivo csv
+        try {
+            var items = reportService.readStockReport(reportPath);
 
-        // 2. para cada item do csv chamar a api do setor de compras
+            items.forEach(item -> {
+                if (item.getQuantity() < item.getReorderThreshold()) {
 
-        // 3. salvar no mongoDB os items que foram comprados
+                    // 1. calcular a quantidade a ser comprada
+                    var reorderQuantity = calculateReorderQuantity(item);
 
+                    // 2. para cada item do csv chamar a api do setor de compras
+
+
+                    // 3. salvar no mongoDB os items que foram comprados
+                }
+            });
+
+
+        } catch (IOException e) {
+            throw  new RuntimeException(e);
+        }
+    }
+
+    private Integer calculateReorderQuantity(CsvStockItem items) {
+        return items.getReorderThreshold() + ((int)Math.ceil(items.getReorderThreshold() * 0.2));
     }
 
 

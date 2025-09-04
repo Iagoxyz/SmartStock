@@ -8,9 +8,11 @@ import java.io.IOException;
 @Service
 public class SmartStockService {
 
+    private final PurchaseSectorService purchaseSectorService;
     private final ReportService reportService;
 
-    public SmartStockService(ReportService reportService) {
+    public SmartStockService(PurchaseSectorService purchaseSectorService, ReportService reportService) {
+        this.purchaseSectorService = purchaseSectorService;
         this.reportService = reportService;
     }
 
@@ -27,6 +29,7 @@ public class SmartStockService {
                     var reorderQuantity = calculateReorderQuantity(item);
 
                     // 2. para cada item do csv chamar a api do setor de compras
+                    purchaseSectorService.sendPurchaseRequest(item, reorderQuantity);
 
 
                     // 3. salvar no mongoDB os items que foram comprados
